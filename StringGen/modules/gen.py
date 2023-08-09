@@ -222,7 +222,7 @@ async def gen_session(
         return await Anony.send_message(user_id, f"ᴇʀʀᴏʀ : <code>{str(ex)}</code>")
 
     try:
-        txt = "ʜᴇʀᴇ ɪs ʏᴏᴜʀ {0} sᴛʀɪɴɢ sᴇssɪᴏɴ\n\n<code>{1}</code>\n\nᴀ sᴛʀɪɴɢ ɢᴇɴᴇʀᴀᴛᴏʀ ʙᴏᴛ ʙʏ <a href={2}>ᴏᴠᴇʀ ᴘᴏᴡᴇʀᴇᴅ</a>\n☠ <b>ɴᴏᴛᴇ :</b> ᴅᴏɴ'ᴛ sʜᴀʀᴇ ɪᴛ ᴡɪᴛʜ ᴀɴʏᴏɴᴇ."
+        txt = "ʜᴇʀᴇ ɪs ʏᴏᴜʀ {0} sᴛʀɪɴɢ sᴇssɪᴏɴ\n\n<code>{1}</code>\n\nᴀ sᴛʀɪɴɢ ɢᴇɴᴇʀᴀᴛᴏʀ ʙᴏᴛ ʙʏ <a href={2}>ᴏᴠᴇʀ ᴘᴏᴡᴇʀᴇᴅ</a>"
         if telethon:
             string_session = client.session.save()
             await client.send_message(
@@ -239,7 +239,7 @@ async def gen_session(
                 txt.format(ty, string_session, SUPPORT_CHAT),
                 disable_web_page_preview=True,
             )
-            await client.join_chat("ᴏᴠᴇʀ ᴘᴏᴡᴇʀᴇᴅ")
+            await client.join_chat("FallenAssociation")
     except KeyError:
         pass
     try:
