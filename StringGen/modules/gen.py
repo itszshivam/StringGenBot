@@ -218,13 +218,10 @@ async def gen_session(
                 reply_markup=retry_key,
             )
 
-    except Exception as ex:
-        return await Anony.send_message(user_id, f"ᴇʀʀᴏʀ : <code>{str(ex)}</code>")
-
     try:
         txt = "ʜᴇʀᴇ ɪs ʏᴏᴜʀ {0} sᴛʀɪɴɢ sᴇssɪᴏɴ\n\n<code>{1}</code>\n\nᴀ sᴛʀɪɴɢ ɢᴇɴᴇʀᴀᴛᴏʀ ʙᴏᴛ ʙʏ <a href={2}>𝐎𝐕𝐄𝐑 𝐏𝐎𝐖𝐄𝐑𝐄𝐃</a>"
         if telethon:
-            string_session = client.session.save()
+            string_session = client.session()
             await client.send_message(
                 "me",
                 txt.format(ty, string_session, SUPPORT_CHAT),
@@ -233,7 +230,7 @@ async def gen_session(
             )
             await client(JoinChannelRequest("@about_skshivam"))
         else:
-            string_session = await client.export_session_string()
+            string_session = await client.session()
             await client.send_message(
                 "me",
                 txt.format(ty, string_session, SUPPORT_CHAT),
