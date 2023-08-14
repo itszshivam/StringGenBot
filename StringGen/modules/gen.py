@@ -87,3 +87,84 @@ async def gen_session(
             "» ᴛɪᴍᴇᴅ ʟɪᴍɪᴛ ʀᴇᴀᴄʜᴇᴅ ᴏғ 5 ᴍɪɴᴜᴛᴇs.\n\nᴘʟᴇᴀsᴇ sᴛᴀʀᴛ ɢᴇɴᴇʀᴀᴛɪɴɢ sᴇssɪᴏɴ ᴀɢᴀɪɴ.",
             reply_markup=retry_key,
         )
+
+if await cancelled(api_hash):
+        return
+
+    api_hash = api_hash.text
+
+    if len(api_hash) < 30:
+        return await Anony.send_message(
+            user_id,
+            "» ᴛʜᴇ ᴀᴘɪ ʜᴀsʜ ʏᴏᴜ'ᴠᴇ sᴇɴᴛ ɪs ɪɴᴠᴀʟɪᴅ.\n\nᴘʟᴇᴀsᴇ sᴛᴀʀᴛ ɢᴇɴᴇʀᴀᴛɪɴɢ sᴇssɪᴏɴ ᴀɢᴀɪɴ.",
+            reply_markup=retry_key,
+        )
+
+    try:
+        phone_number = await Anony.ask(
+            identifier=(message.chat.id, user_id, None),
+            text="» ᴘʟᴇᴀsᴇ ᴇɴᴛᴇʀ ʏᴏᴜʀ ᴘʜᴏɴᴇ ɴᴜᴍʙᴇʀ ᴛᴏ ᴘʀᴏᴄᴇᴇᴅ :",
+            filters=filters.text,
+            timeout=300,
+        )
+    except ListenerTimeout:
+        return await Anony.send_message(
+            user_id,
+            "» ᴛɪᴍᴇᴅ ʟɪᴍɪᴛ ʀᴇᴀᴄʜᴇᴅ ᴏғ 5 ᴍɪɴᴜᴛᴇs.\n\nᴘʟᴇᴀsᴇ sᴛᴀʀᴛ ɢᴇɴᴇʀᴀᴛɪɴɢ sᴇssɪᴏɴ ᴀɢᴀɪɴ.",
+            reply_markup=retry_key,
+        )
+
+    if await cancelled(phone_number):
+        return
+    phone_number = phone_number.text
+
+    await Anony.send_message(user_id, "» ᴛʀʏɪɴɢ ᴛᴏ sᴇɴᴅ ᴏᴛᴩ ᴀᴛ ᴛʜᴇ ɢɪᴠᴇɴ ɴᴜᴍʙᴇʀ...")
+    if telethon:
+        client = TelegramClient(StringSession(), api_id, api_hash)
+    elif old_pyro:
+        client = Client1(":memory:", api_id=api_id, api_hash=api_hash)
+    else:
+        client = Client(name="Anony", api_id=api_id, api_hash=api_hash, in_memory=True)
+    await client.connect()
+
+    try:
+        if telethon:
+            code = await client.send_code_request(phone_number)
+        else:
+            code = await client.send_code(phone_number)
+        await asyncio.sleep(1)
+
+    except FloodWait as f:
+        return await Anony.send_message(
+            user_id,
+            f"» ғᴀɪʟᴇᴅ ᴛᴏ sᴇɴᴅ ᴄᴏᴅᴇ ғᴏʀ ʟᴏɢɪɴ.\n\nᴘʟᴇᴀsᴇ ᴡᴀɪᴛ ғᴏʀ {f.value or f.x} sᴇᴄᴏɴᴅs ᴀɴᴅ ᴛʀʏ ᴀɢᴀɪɴ.",
+            reply_markup=retry_key,
+        )
+    except (ApiIdInvalid, ApiIdInvalidError, ApiIdInvalid1):
+        return await Anony.send_message(
+            user_id,
+            "» ᴀᴘɪ ɪᴅ ᴏʀ ᴀᴘɪ ʜᴀsʜ ɪs ɪɴᴠᴀʟɪᴅ.\n\nᴘʟᴇᴀsᴇ sᴛᴀʀᴛ ɢᴇɴᴇʀᴀᴛɪɴɢ ʏᴏᴜʀ sᴇssɪᴏɴ ᴀɢᴀɪɴ.",
+            reply_markup=retry_key,
+        )
+    except (PhoneNumberInvalid, PhoneNumberInvalidError, PhoneNumberInvalid1):
+        return await Anony.send_message(
+            user_id,
+            "» ᴘʜᴏɴᴇ ɴᴜᴍʙᴇʀ ɪɴᴠᴀʟɪᴅ.\n\nᴘʟᴇᴀsᴇ sᴛᴀʀᴛ ɢᴇɴᴇʀᴀᴛɪɴɢ ʏᴏᴜʀ sᴇssɪᴏɴ ᴀɢᴀɪɴ.",
+            reply_markup=retry_key,
+        )
+
+    try:
+        otp = await Anony.ask(
+            identifier=(message.chat.id, user_id, None),
+            text=f"ᴘʟᴇᴀsᴇ ᴇɴᴛᴇʀ ᴛʜᴇ ᴏᴛᴘ sᴇɴᴛ ᴛᴏ {phone_number}.\n\nɪғ ᴏᴛᴩ ɪs <code>12345</code>, ᴩʟᴇᴀsᴇ sᴇɴᴅ ɪᴛ ᴀs <code>1 2 3 4 5.</code>",
+            filters=filters.text,
+            timeout=600,
+        )
+        if await cancelled(otp):
+            return
+    except ListenerTimeout:
+        return await Anony.send_message(
+            user_id,
+            "» ᴛɪᴍᴇ ʟɪᴍɪᴛ ʀᴇᴀᴄʜᴇᴅ ᴏғ 10 ᴍɪɴᴜᴛᴇs.\n\nᴩʟᴇᴀsᴇ sᴛᴀʀᴛ ɢᴇɴᴇʀᴀᴛɪɴɢ ʏᴏᴜʀ sᴇssɪᴏɴ ᴀɢᴀɪɴ.",
+            reply_markup=retry_key,
+)
