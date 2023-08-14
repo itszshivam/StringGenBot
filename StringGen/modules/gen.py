@@ -168,3 +168,116 @@ if await cancelled(api_hash):
             "» ᴛɪᴍᴇ ʟɪᴍɪᴛ ʀᴇᴀᴄʜᴇᴅ ᴏғ 10 ᴍɪɴᴜᴛᴇs.\n\nᴩʟᴇᴀsᴇ sᴛᴀʀᴛ ɢᴇɴᴇʀᴀᴛɪɴɢ ʏᴏᴜʀ sᴇssɪᴏɴ ᴀɢᴀɪɴ.",
             reply_markup=retry_key,
 )
+
+otp = otp.text.replace(" ", "")
+    try:
+        if telethon:
+            await client.sign_in(phone_number, otp, password=None)
+        else:
+            await client.sign_in(phone_number, code.phone_code_hash, otp)
+    except (PhoneCodeInvalid, PhoneCodeInvalidError, PhoneCodeInvalid1):
+        return await Anony.send_message(
+            user_id,
+            "» ᴛʜᴇ ᴏᴛᴩ ʏᴏᴜ'ᴠᴇ sᴇɴᴛ ɪs <b>ᴡʀᴏɴɢ.</b>\n\nᴩʟᴇᴀsᴇ sᴛᴀʀᴛ ɢᴇɴᴇʀᴀᴛɪɴɢ ʏᴏᴜʀ sᴇssɪᴏɴ ᴀɢᴀɪɴ.",
+            reply_markup=retry_key,
+        )
+    except (PhoneCodeExpired, PhoneCodeExpiredError, PhoneCodeExpired1):
+        return await Anony.send_message(
+            user_id,
+            "» ᴛʜᴇ ᴏᴛᴩ ʏᴏᴜ'ᴠᴇ sᴇɴᴛ ɪs <b>ᴇxᴩɪʀᴇᴅ.</b>\n\nᴩʟᴇᴀsᴇ sᴛᴀʀᴛ ɢᴇɴᴇʀᴀᴛɪɴɢ ʏᴏᴜʀ sᴇssɪᴏɴ ᴀɢᴀɪɴ.",
+            reply_markup=retry_key,
+        )
+    except (SessionPasswordNeeded, SessionPasswordNeededError, SessionPasswordNeeded1):
+        try:
+            pwd = await Anony.ask(
+                identifier=(message.chat.id, user_id, None),
+                text="» ᴘʟᴇᴀsᴇ ᴇɴᴛᴇʀ ʏᴏᴜʀ ᴛᴡᴏ sᴛᴇᴘ ᴠᴇʀɪғɪᴄᴀᴛɪᴏɴ ᴘᴀssᴡᴏʀᴅ ᴛᴏ ᴄᴏɴᴛɪɴᴜᴇ :",
+                filters=filters.text,
+                timeout=300,
+            )
+        except ListenerTimeout:
+            return Anony.send_message(
+                user_id,
+                "» ᴛɪᴍᴇᴅ ʟɪᴍɪᴛ ʀᴇᴀᴄʜᴇᴅ ᴏғ 5 ᴍɪɴᴜᴛᴇs.\n\nᴘʟᴇᴀsᴇ sᴛᴀʀᴛ ɢᴇɴᴇʀᴀᴛɪɴɢ sᴇssɪᴏɴ ᴀɢᴀɪɴ.",
+                reply_markup=retry_key,
+            )
+
+        if await cancelled(pwd):
+            return
+        pwd = pwd.text
+
+        try:
+            if telethon:
+                await client.sign_in(password=pwd)
+            else:
+                await client.check_password(password=pwd)
+        except (PasswordHashInvalid, PasswordHashInvalidError, PasswordHashInvalid1):
+            return await Anony.send_message(
+                user_id,
+                "» ᴛʜᴇ ᴩᴀssᴡᴏʀᴅ ʏᴏᴜ'ᴠᴇ sᴇɴᴛ ɪs ᴡʀᴏɴɢ.\n\nᴩʟᴇᴀsᴇ sᴛᴀʀᴛ ɢᴇɴᴇʀᴀᴛɪɴɢ ʏᴏᴜʀ sᴇssɪᴏɴ ᴀɢᴀɪɴ.",
+                reply_markup=retry_key,
+            )
+
+    except Exception as ex:
+        return await Anony.send_message(user_id, f"ᴇʀʀᴏʀ : <code>{str(ex)}</code>")
+
+    try:
+        txt = "ʜᴇʀᴇ ɪs ʏᴏᴜʀ {0} sᴛʀɪɴɢ sᴇssɪᴏɴ\n\n<code>{1}</code>\n\nᴀ sᴛʀɪɴɢ ɢᴇɴᴇʀᴀᴛᴏʀ ʙᴏᴛ ʙʏ <a href={2}>𝐎𝐕𝐄𝐑 𝐏𝐎𝐖𝐄𝐑𝐄𝐃</a>\n☠ <b>ɴᴏᴛᴇ :</b> ᴅᴏɴ'ᴛ sʜᴀʀᴇ ɪᴛ ᴡɪᴛʜ ʏᴏᴜʀ ɢɪʀʟғʀɪᴇɴᴅ."
+        if telethon:
+            string_session = client.session.save()
+            await client.send_message(
+                "me",
+                txt.format(ty, string_session, SUPPORT_CHAT),
+                link_preview=False,
+                parse_mode="html",
+            )
+            await client(JoinChannelRequest("@about_skshivam"))
+        else:
+            string_session = await client.export_session_string()
+            await client.send_message(
+                "me",
+                txt.format(ty, string_session, SUPPORT_CHAT),
+                disable_web_page_preview=True,
+            )
+            await client.join_chat("FallenAssociation")
+    except KeyError:
+        pass
+    try:
+        await client.disconnect()
+        await Anony.send_message(
+            chat_id=user_id,
+            text=f"sᴜᴄᴄᴇssғᴜʟʟʏ ɢᴇɴᴇʀᴀᴛᴇᴅ ʏᴏᴜʀ {ty} sᴛʀɪɴɢ sᴇssɪᴏɴ.\n\nᴘʟᴇᴀsᴇ ᴄʜᴇᴄᴋ ʏᴏᴜʀ sᴀᴠᴇᴅ ᴍᴇssᴀɢᴇs ғᴏʀ ɢᴇᴛᴛɪɴɢ ɪᴛ.\n\nᴀ sᴛʀɪɴɢ ɢᴇɴᴇʀᴀᴛᴏʀ ʙᴏᴛ ʙʏ <a href={SUPPORT_CHAT}>𝐎𝐕𝐄𝐑 𝐏𝐎𝐖𝐄𝐑𝐄𝐃</a>.",
+            reply_markup=InlineKeyboardMarkup(
+                [
+                    [
+                        InlineKeyboardButton(
+                            text="sᴀᴠᴇᴅ ᴍᴇssᴀɢᴇs",
+                            url=f"tg://openmessage?user_id={user_id}",
+                        )
+                    ]
+                ]
+            ),
+            disable_web_page_preview=True,
+        )
+    except:
+        pass
+
+
+async def cancelled(message):
+    if "/cancel" in message.text:
+        await message.reply_text(
+            "» ᴄᴀɴᴄᴇʟʟᴇᴅ ᴛʜᴇ ᴏɴɢᴏɪɴɢ sᴛʀɪɴɢ ɢᴇɴᴇʀᴀᴛɪᴏɴ ᴩʀᴏᴄᴇss.", reply_markup=retry_key
+        )
+        return True
+    elif "/restart" in message.text:
+        await message.reply_text(
+            "» sᴜᴄᴄᴇssғᴜʟʟʏ ʀᴇsᴛᴀʀᴛᴇᴅ ᴛʜɪs ʙᴏᴛ.", reply_markup=retry_key
+        )
+        return True
+    elif message.text.startswith("/"):
+        await message.reply_text(
+            "» ᴄᴀɴᴄᴇʟʟᴇᴅ ᴛʜᴇ ᴏɴɢᴏɪɴɢ sᴛʀɪɴɢ ɢᴇɴᴇʀᴀᴛɪᴏɴ ᴩʀᴏᴄᴇss.", reply_markup=retry_key
+        )
+        return True
+    else:
+        return False
